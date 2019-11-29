@@ -1,41 +1,88 @@
 import React from 'react';
+import {
+  BrowserRouter as Router, Switch, Route, Link,
+} from 'react-router-dom';
 import { connect } from 'react-redux';
-// import { func, shape } from 'prop-types';
-import { Button, List } from 'semantic-ui-react';
+import { Nav, Navbar, Container } from 'react-bootstrap';
+import { func } from 'prop-types';
+import Index from '../components/Index';
+import Todos from '../components/Todos';
+import Agregar from '../components/Agregar';
 
-class Home extends React.Component {
-  Realizado = ({ target }) => {
-    this.props.AddRealizado(target);
-  };
-
-  render() {
-    const { tareas } = this.props;
-    console.log(tareas);
-    return (
-      <List divided verticalAlign="middle">
-        {tareas.map((tarea) => {
-          if (!tarea.estado) {
-            return (
-              <List.Item key={tarea.nombre}>
-                <List.Content floated="right">
-                  <Button onClick={this.Realizado}>Marcar como realizada</Button>
-                </List.Content>
-                <List.Content>{tarea.nombre}</List.Content>
-              </List.Item>
-            );
-          }
-        })}
-      </List>
-    );
+function Home({ AddRealizado, DeleteTarea }) {
+  function Realizado({ target }) {
+    AddRealizado(target);
   }
+
+  function Eliminar({ target }) {
+    DeleteTarea(target);
+  }
+
+  return (
+    <Router>
+      <Navbar bg="primary" expand="lg">
+        <Container>
+          <Navbar.Brand className="font-weight-bold text-uppercase">
+            <Link to="/" className="text-decoration-none">
+              <h3 className="text-white">Lista Tareas</h3>
+            </Link>
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" className="bg-light" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ml-auto py-3">
+              <Nav.Item>
+                <Nav.Link>
+                  <Link to="/" className="text-white">
+                    Tareas Pendientes
+                  </Link>
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link>
+                  <Link to="/todas" className="text-white">
+                    Todas las Tareas
+                  </Link>
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link>
+                  <Link to="/agregar" className="text-white">
+                    Agregar Tarea
+                  </Link>
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+      <Switch>
+        <Route exact path="/">
+          <Index Realizado={Realizado} Eliminar={Eliminar} />
+        </Route>
+        <Route path="/todas">
+          <Todos Realizado={Realizado} Eliminar={Eliminar} />
+        </Route>
+        <Route path="/agregar">
+          <Agregar />
+        </Route>
+      </Switch>
+    </Router>
+  );
 }
 
+Home.propTypes = {
+  AddRealizado: func.isRequired,
+  DeleteTarea: func.isRequired,
+};
+
 const mapStateToProps = (state) => ({
-  tareas: state.tareas,
+  ...state,
 });
 
 const mapDispatchProps = (dispatch) => ({
   AddRealizado: (target) => dispatch({ type: 'AddRealizado', target }),
+  DeleteTarea: (target) => dispatch({ type: 'DeleteTarea', target }),
 });
 
 export default connect(

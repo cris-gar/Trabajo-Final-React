@@ -20,7 +20,7 @@ const reducer = (state = INITIAL_STATE, action) => {
     default:
       return state;
     case 'AddRealizado':
-      texto = action.target.closest('div.item').children[1].innerText;
+      texto = action.target.closest('li').children[0].innerText;
       index = state.tareas.map((t) => t.nombre).indexOf(texto);
       return {
         ...state,
@@ -28,6 +28,12 @@ const reducer = (state = INITIAL_STATE, action) => {
           [index]: { $set: { estado: true, nombre: state.tareas[index].nombre } },
         }),
       };
+    case 'AddTarea':
+      return { ...state, tareas: state.tareas.concat({ nombre: action.value, estado: false }) };
+    case 'DeleteTarea':
+      texto = action.target.closest('li').children[0].innerText;
+      index = state.tareas.map((t) => t.nombre).indexOf(texto);
+      return { ...state, tareas: update(state.tareas, { $splice: [[index, 1]] }) };
   }
 };
 
